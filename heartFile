@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever Your Love</title>
+
+<style>
+body {
+    margin: 0;
+    background: #0a0a0a;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+h1 {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    text-align: center;
+    font-weight: 300;
+    letter-spacing: 3px;
+    z-index: 2;
+}
+
+/* Сердце */
+.heart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    width: 150px;
+    height: 150px;
+    background: red;
+    animation: pulse 1.5s infinite;
+    z-index: 2;
+}
+
+.heart::before,
+.heart::after {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: red;
+    border-radius: 50%;
+}
+
+.heart::before {
+    top: -75px;
+    left: 0;
+}
+
+.heart::after {
+    left: 75px;
+    top: 0;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+        box-shadow: 0 0 20px red;
+    }
+    50% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(1.2);
+        box-shadow: 0 0 40px red;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(1);
+        box-shadow: 0 0 20px red;
+    }
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>
+</head>
+
+<body>
+
+<h1>FOREVER YOUR LOVE</h1>
+<div class="heart" id="heart"></div>
+<canvas id="particles"></canvas>
+
+<script>
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let bgParticles = [];
+let heartParticles = [];
+
+for (let i = 0; i < 80; i++) {
+    bgParticles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2,
+        speedX: (Math.random() - 0.5) * 0.3,
+        speedY: (Math.random() - 0.5) * 0.3
+    });
+}
+
+function createHeartParticle(x, y) {
+    heartParticles.push({
+        x: x,
+        y: y,
+        size: Math.random() * 3 + 1,
+        speedX: (Math.random() - 0.5) * 2,
+        speedY: (Math.random() - 0.5) * 2,
+        life: 100
+    });
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // фоновые частицы
+    bgParticles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fill();
+    });
+
+    // координаты центра сердца
+    let heart = document.getElementById("heart");
+    let rect = heart.getBoundingClientRect();
+    let centerX = rect.left + rect.width / 2;
+    let centerY = rect.top + rect.height / 2;
+
+    // создаём новые частицы из сердца
+    for (let i = 0; i < 3; i++) {
+        createHeartParticle(centerX, centerY);
+    }
+
+    // частицы сердца
+    heartParticles.forEach((p, index) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.life--;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 80, 80," + (p.life/100) + ")";
+        ctx.fill();
+
+        if (p.life <= 0) {
+            heartParticles.splice(index, 1);
+        }
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
